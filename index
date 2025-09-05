@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Menu Ujian</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 30px;
+      color: #333;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    a {
+      display: block;
+      padding: 12px 20px;
+      background: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    a:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Daftar Ujian</h1>
+  <div class="grid">
+    <a href="PAIBP 10.html">PAIBP 10</a>
+    <a href="PAIBP 11.html">PAIBP 11</a>
+    <a href="PAIBP 12.html">PAIBP 12</a>
+    <a href="P. PANCASILA 10.html">P. PANCASILA 10</a>
+    <a href="P. PANCASILA 11.html">P. PANCASILA 11</a>
+    <a href="P. PANCASILA 12.html">P. PANCASILA 12</a>
+    <a href="B. INDONESIA 10.html">B. INDONESIA 10</a>
+    <a href="B. INDONESIA 11.html">B. INDONESIA 11</a>
+    <a href="B. INDONESIA 12.html">B. INDONESIA 12</a>
+    <a href="FISIKA 10.html">FISIKA 10</a>
+    <a href="FISIKA 11.html">FISIKA 11</a>
+    <a href="FISIKA 12.html">FISIKA 12</a>
+    <a href="KIMIA 10.html">KIMIA 10</a>
+    <a href="KIMIA 11.html">KIMIA 11</a>
+    <a href="KIMIA 12.html">KIMIA 12</a>
+    <a href="BIOLOGI 10.html">BIOLOGI 10</a>
+    <a href="BIOLOGI 11.html">BIOLOGI 11</a>
+    <a href="BIOLOGI 12.html">BIOLOGI 12</a>
+    <a href="B. INGGRIS 10.html">B. INGGRIS 10</a>
+    <a href="B. INGGRIS 11.html">B. INGGRIS 11</a>
+    <a href="B. INGGRIS 12.html">B. INGGRIS 12</a>
+    <a href="B. INGGRIS TINGKAT LANJUT 11B.html">B. INGGRIS TINGKAT LANJUT 11B</a>
+    <a href="SEJARAH 10.html">SEJARAH 10</a>
+    <a href="SEJARAH 11.html">SEJARAH 11</a>
+    <a href="SEJARAH 12.html">SEJARAH 12</a>
+    <a href="SEJARAH TL 11.html">SEJARAH TL 11</a>
+    <a href="SEJARAH TL 12.html">SEJARAH TL 12</a>
+    <a href="GEOGRAFI 10.html">GEOGRAFI 10</a>
+    <a href="GEOGRAFI 11.html">GEOGRAFI 11</a>
+    <a href="GEOGRAFI 12.html">GEOGRAFI 12</a>
+    <a href="SOSIOLOGI 10.html">SOSIOLOGI 10</a>
+    <a href="SOSIOLOGI 11.html">SOSIOLOGI 11</a>
+    <a href="SOSIOLOGI 12.html">SOSIOLOGI 12</a>
+    <a href="EKONOMI 11.html">EKONOMI 11</a>
+    <a href="EKONOMI 12.html">EKONOMI 12</a>
+    <a href="INFORMATIKA 10.html">INFORMATIKA 10</a>
+    <a href="TIK 11.html">TIK 11</a>
+    <a href="CODING & AI 10.html">CODING & AI 10</a>
+    <a href="SENI DAN PRAKARYA 10.html">SENI DAN PRAKARYA 10</a>
+    <a href="SENI DAN BUDAYA 11.html">SENI DAN BUDAYA 11</a>
+    <a href="SENI DAN BUDAYA 12.html">SENI DAN BUDAYA 12</a>
+    <a href="B. SUNDA 10.html">B. SUNDA 10</a>
+    <a href="B. SUNDA 11.html">B. SUNDA 11</a>
+    <a href="B. SUNDA 12.html">B. SUNDA 12</a>
+  </div>
+</body>
+</html>
