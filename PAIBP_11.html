@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ujian PAIBP 11</title>
+<style>
+  body, html { margin:0; padding:0; height:100%; overflow:hidden; font-family:sans-serif; }
+  iframe { width:100%; height:100%; border:none; }
+  .modal {
+    display:none; position:fixed; top:0; left:0;
+    width:100%; height:100%; background: rgba(0,0,0,0.7);
+    justify-content:center; align-items:center; z-index:1000;
+  }
+  .modal-content {
+    background:#fff; padding:20px; border-radius:10px;
+    text-align:center; max-width:90%;
+  }
+  .modal-content button {
+    margin-top:15px; padding:10px 20px; border:none;
+    background:#007BFF; color:#fff; border-radius:5px;
+    font-size:16px;
+  }
+</style>
+</head>
+<body>
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeGVq6cARGK0JKL9zJeSLq-Y4x3nRGPZ86YYKX8-HZOK3fQrA/viewform?usp=dialog" id="examFrame"></iframe>
+<div id="peringatanModal" class="modal">
+  <div class="modal-content">
+    <p id="peringatanText">Peringatan!</p>
+    <button onclick="tutupModal()">OK</button>
+  </div>
+</div>
+<script>
+let pelanggaran = parseInt(localStorage.getItem('PAIBP 11_pelanggaran')) || 0;
+const modal = document.getElementById('peringatanModal');
+const teks = document.getElementById('peringatanText');
+function showModal(msg){ teks.textContent = msg; modal.style.display = 'flex'; }
+function tutupModal(){ modal.style.display = 'none'; }
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden){
+    pelanggaran++;
+    localStorage.setItem('PAIBP 11_pelanggaran', pelanggaran);
+    if(pelanggaran >= 3){
+      window.location.href = "akses_ditutup.html";
+    } else {
+      showModal(`Peringatan! Anda sudah ${pelanggaran} kali mencoba meninggalkan aplikasi/tab.`);
+    }
+  }
+});
+document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+</body>
+</html>
