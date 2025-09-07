@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>PJOK 10</title>
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: none; }
+  </style>
+  <script>
+    document.addEventListener("keydown", function (e) {
+      if (e.ctrlKey && (e.key === "c" || e.key === "C" || e.key === "u" || e.key === "U" || e.key === "s" || e.key === "S" || e.key === "p" || e.key === "P" || e.key === "f" || e.key === "F")) {
+        e.preventDefault();
+        alert("Tindakan ini dilarang selama ujian.");
+      }
+      if (e.key === "F12") {
+        e.preventDefault();
+        alert("Inspect element dilarang.");
+      }
+    });
+
+    document.addEventListener("contextmenu", function(e) {
+      e.preventDefault();
+      alert("Klik kanan dinonaktifkan.");
+    });
+
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden) {
+        alert("Anda terdeteksi berpindah tab atau meminimalkan layar!");
+      }
+    });
+  </script>
+</head>
+<body>
+  <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfMJGi7iNck1QuCZEsxQH-f0xqkcutwchTnVTm0bo-IVDUtjw/viewform?usp=dialog"></iframe>
+</body>
+</html>
