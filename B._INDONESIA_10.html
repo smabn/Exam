@@ -24,19 +24,27 @@
 </style>
 </head>
 <body>
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeHwzLQrdzi_DPj1SugPnCIaof1zlrGu87orvLbTzD4d3ujIA/viewform?usp=dialog" id="examFrame"></iframe>
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfqfZUv6p0_k0IbAozo19lFsReABYgyhmAHUcJcsKK4havbfw/viewform?usp=header" id="examFrame"></iframe>
+
 <div id="peringatanModal" class="modal">
   <div class="modal-content">
     <p id="peringatanText">Peringatan!</p>
     <button onclick="tutupModal()">OK</button>
   </div>
 </div>
+
 <script>
 let pelanggaran = parseInt(localStorage.getItem('B. INDONESIA 10_pelanggaran')) || 0;
 const modal = document.getElementById('peringatanModal');
 const teks = document.getElementById('peringatanText');
-function showModal(msg){ teks.textContent = msg; modal.style.display = 'flex'; }
+
+function showModal(msg){ 
+  teks.textContent = msg; 
+  modal.style.display = 'flex'; 
+}
 function tutupModal(){ modal.style.display = 'none'; }
+
+// 🔹 Deteksi pindah tab
 document.addEventListener('visibilitychange', () => {
   if(document.hidden){
     pelanggaran++;
@@ -44,10 +52,49 @@ document.addEventListener('visibilitychange', () => {
     if(pelanggaran >= 3){
       window.location.href = "akses_ditutup.html";
     } else {
-      showModal(`Peringatan! Anda sudah ${pelanggaran} kali mencoba meninggalkan aplikasi/tab.`);
+      showModal(`Peringatan! Anda sudah ${pelanggaran} kali mencoba meninggalkan tab ujian.`);
     }
   }
 });
+
+// 🔹 Deteksi coba keluar / buka link lain di tab yang sama
+window.addEventListener("beforeunload", (event) => {
+  pelanggaran++;
+  localStorage.setItem('B. INDONESIA 10_pelanggaran', pelanggaran);
+  if(pelanggaran >= 3){
+    window.location.href = "akses_ditutup.html";
+  } else {
+    showModal(`Peringatan! Anda mencoba meninggalkan halaman ujian. Pelanggaran ke-${pelanggaran}`);
+  }
+  event.preventDefault();
+  event.returnValue = "";
+});
+
+// 🔹 Paksa fullscreen saat mulai
+function openFullscreen() {
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) elem.requestFullscreen();
+  else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+  else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+  else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+}
+openFullscreen();
+
+// 🔹 Deteksi keluar fullscreen
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+    pelanggaran++;
+    localStorage.setItem('B. INDONESIA 10_pelanggaran', pelanggaran);
+    if(pelanggaran >= 3){
+      window.location.href = "akses_ditutup.html";
+    } else {
+      showModal(`Jangan keluar dari fullscreen! Pelanggaran ke-${pelanggaran}`);
+      openFullscreen(); // paksa masuk fullscreen lagi
+    }
+  }
+});
+
+// 🔹 Nonaktifkan klik kanan
 document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 </body>
