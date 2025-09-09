@@ -1,101 +1,167 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Ujian B. INDONESIA 10</title>
 <style>
-  body, html { margin:0; padding:0; height:100%; overflow:hidden; font-family:sans-serif; }
-  iframe { width:100%; height:100%; border:none; }
-  .modal {
-    display:none; position:fixed; top:0; left:0;
-    width:100%; height:100%; background: rgba(0,0,0,0.7);
-    justify-content:center; align-items:center; z-index:1000;
-  }
-  .modal-content {
-    background:#fff; padding:20px; border-radius:10px;
-    text-align:center; max-width:90%;
-  }
-  .modal-content button {
-    margin-top:15px; padding:10px 20px; border:none;
-    background:#007BFF; color:#fff; border-radius:5px;
-    font-size:16px;
-  }
+  body,html{margin:0;padding:0;height:100%;font-family:sans-serif;background:#fff}
+  #container{height:100vh;display:flex;flex-direction:column}
+  iframe{flex:1;border:0;width:100%}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;justify-content:center;align-items:center;z-index:9999;color:#fff;padding:20px;box-sizing:border-box}
+  .card{background:#fff;color:#111;padding:18px;border-radius:10px;max-width:420px;width:100%;text-align:center}
+  .btn{display:inline-block;margin-top:12px;padding:10px 16px;border-radius:8px;background:#007bff;color:#fff;border:0;font-size:16px}
+  .small{font-size:13px;color:#666;margin-top:8px}
+  #warningModal{display:none;position:fixed;inset:0;z-index:9998;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.6)}
+  #warningCard{background:#fff;padding:18px;border-radius:10px;text-align:center;max-width:90%}
 </style>
 </head>
 <body>
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfqfZUv6p0_k0IbAozo19lFsReABYgyhmAHUcJcsKK4havbfw/viewform?usp=header" id="examFrame"></iframe>
+<div id="container">
+  <!-- iframe kosong dulu; akan di-set src saat "Mulai Ujian" -->
+  <iframe id="examIframe" src="about:blank" allow="fullscreen"></iframe>
+</div>
 
-<div id="peringatanModal" class="modal">
-  <div class="modal-content">
-    <p id="peringatanText">Peringatan!</p>
-    <button onclick="tutupModal()">OK</button>
+<!-- Start overlay (wajib klik) -->
+<div id="startOverlay" class="overlay" role="dialog" aria-modal="true">
+  <div class="card">
+    <h2>Ujian B. INDONESIA 10</h2>
+    <p class="small">Sebelum mulai: <br>- Klik <strong>Mulai Ujian</strong> lalu izinkan Fullscreen. <br>- Jangan buka aplikasi atau tab lain selama ujian. <br>- 3x pelanggaran → akses ditutup.</p>
+    <button id="startBtn" class="btn">Mulai Ujian</button>
+    <p class="small">Jika browser tidak izinkan fullscreen otomatis, siswa tetap bisa lanjut tetapi deteksi mungkin berkurang di beberapa browser lama.</p>
+  </div>
+</div>
+
+<!-- Modal peringatan -->
+<div id="warningModal">
+  <div id="warningCard">
+    <p id="warningText">Peringatan!</p>
+    <p class="small">Anda sudah <span id="attempts">0</span> dari 3 pelanggaran.</p>
+    <button class="btn" onclick="closeWarning()">OK</button>
   </div>
 </div>
 
 <script>
-let pelanggaran = parseInt(localStorage.getItem('B. INDONESIA 10_pelanggaran')) || 0;
-const modal = document.getElementById('peringatanModal');
-const teks = document.getElementById('peringatanText');
+/* ========== Konfigurasi (ubah jika perlu) ========== */
+const SAFE_KEY = 'B_INDONESIA_10'; // pakai underscore, huruf besar
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeHwzLQrdzi_DPj1SugPnCIaof1zlrGu87orvLbTzD4d3ujIA/viewform?usp=dialog';
+const MAX_VIOLATIONS = 3;
+const DEBOUNCE_MS = 1000; // mencegah double-counting event ganda
+/* =================================================== */
 
-function showModal(msg){ 
-  teks.textContent = msg; 
-  modal.style.display = 'flex'; 
+const iframe = document.getElementById('examIframe');
+const startOverlay = document.getElementById('startOverlay');
+const startBtn = document.getElementById('startBtn');
+const warningModal = document.getElementById('warningModal');
+const warningText = document.getElementById('warningText');
+const attemptsSpan = document.getElementById('attempts');
+
+function getViolations(){
+  return parseInt(localStorage.getItem(SAFE_KEY + '_pelanggaran') || '0');
 }
-function tutupModal(){ modal.style.display = 'none'; }
+function setViolations(n){
+  localStorage.setItem(SAFE_KEY + '_pelanggaran', String(n));
+  attemptsSpan.textContent = String(n);
+}
+function isBlocked(){
+  return getViolations() >= MAX_VIOLATIONS || localStorage.getItem(SAFE_KEY + '_blocked') === '1';
+}
+function blockNow(){
+  localStorage.setItem(SAFE_KEY + '_blocked', '1');
+  // redirect to akses_ditutup.html
+  window.location.href = 'akses_ditutup.html';
+}
 
-// 🔹 Deteksi pindah tab
+/* Debounce prevention: jangan tambah pelanggaran berkali2 dalam waktu singkat */
+let _lastInc = parseInt(localStorage.getItem(SAFE_KEY + '_last_inc') || '0');
+function safeIncrement(reason){
+  try{
+    const now = Date.now();
+    if(now - _lastInc < DEBOUNCE_MS) return; // skip double event
+    _lastInc = now;
+    localStorage.setItem(SAFE_KEY + '_last_inc', String(_lastInc));
+    let v = getViolations() + 1;
+    setViolations(v);
+    console.log('Pel: ', v, ' reason=', reason);
+    if(v >= MAX_VIOLATIONS){
+      blockNow();
+    } else {
+      showWarning(`Peringatan! Anda mencoba keluar dari ujian (alas: ${reason}). Pelanggaran ke-${v}`);
+    }
+  }catch(e){
+    console.warn('inc err', e);
+  }
+}
+
+/* Modal */
+function showWarning(msg){
+  warningText.textContent = msg;
+  attemptsSpan.textContent = String(getViolations());
+  warningModal.style.display = 'flex';
+}
+function closeWarning(){
+  warningModal.style.display = 'none';
+}
+
+/* Check on load if already blocked */
+if(isBlocked()){
+  window.location.href = 'akses_ditutup.html';
+}
+
+/* Event handlers: multiple event types */
 document.addEventListener('visibilitychange', () => {
   if(document.hidden){
-    pelanggaran++;
-    localStorage.setItem('B. INDONESIA 10_pelanggaran', pelanggaran);
-    if(pelanggaran >= 3){
-      window.location.href = "akses_ditutup.html";
-    } else {
-      showModal(`Peringatan! Anda sudah ${pelanggaran} kali mencoba meninggalkan tab ujian.`);
-    }
+    safeIncrement('visibilitychange');
   }
 });
-
-// 🔹 Deteksi coba keluar / buka link lain di tab yang sama
-window.addEventListener("beforeunload", (event) => {
-  pelanggaran++;
-  localStorage.setItem('B. INDONESIA 10_pelanggaran', pelanggaran);
-  if(pelanggaran >= 3){
-    window.location.href = "akses_ditutup.html";
-  } else {
-    showModal(`Peringatan! Anda mencoba meninggalkan halaman ujian. Pelanggaran ke-${pelanggaran}`);
-  }
-  event.preventDefault();
-  event.returnValue = "";
+window.addEventListener('blur', () => {
+  safeIncrement('blur');
+});
+window.addEventListener('pagehide', (e) => {
+  // fired when navigating away / closing tab
+  safeIncrement('pagehide');
+});
+window.addEventListener('beforeunload', (e) => {
+  // may be ignored by some browsers, but tetap set
+  safeIncrement('beforeunload');
 });
 
-// 🔹 Paksa fullscreen saat mulai
-function openFullscreen() {
-  const elem = document.documentElement;
-  if (elem.requestFullscreen) elem.requestFullscreen();
-  else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
-  else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-  else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
-}
-openFullscreen();
-
-// 🔹 Deteksi keluar fullscreen
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement) {
-    pelanggaran++;
-    localStorage.setItem('B. INDONESIA 10_pelanggaran', pelanggaran);
-    if(pelanggaran >= 3){
-      window.location.href = "akses_ditutup.html";
-    } else {
-      showModal(`Jangan keluar dari fullscreen! Pelanggaran ke-${pelanggaran}`);
-      openFullscreen(); // paksa masuk fullscreen lagi
-    }
-  }
+/* pageshow / focus: cek kembali apakah sudah diblokir (mis. kembalinya cepat) */
+window.addEventListener('pageshow', () => {
+  if(isBlocked()) blockNow();
+});
+window.addEventListener('focus', () => {
+  if(isBlocked()) blockNow();
 });
 
-// 🔹 Nonaktifkan klik kanan
+/* Mulai ujian: set iframe src dan minta fullscreen (memerlukan user gesture) */
+startBtn.addEventListener('click', async () => {
+  // jika sudah diblokir, langsung redirect
+  if(isBlocked()) return blockNow();
+
+  // set iframe src (memuat form)
+  iframe.src = FORM_URL;
+
+  // try open fullscreen on documentElement
+  try{
+    const elem = document.documentElement;
+    if(elem.requestFullscreen) await elem.requestFullscreen();
+    else if(elem.webkitRequestFullscreen) await elem.webkitRequestFullscreen();
+    else if(elem.msRequestFullscreen) await elem.msRequestFullscreen();
+    // ok, fullscreen requested (may be rejected by browser)
+  }catch(err){
+    console.warn('fullscreen err', err);
+  }
+
+  // hide overlay
+  startOverlay.style.display = 'none';
+});
+
+/* Nonaktifkan klik kanan / long-press context menu */
 document.addEventListener('contextmenu', e => e.preventDefault());
+
+/* Optional: shortcut ke akses_ditutup bila pelanggaran di localStorage sudah tinggi */
+attemptsSpan.textContent = String(getViolations());
 </script>
 </body>
 </html>
